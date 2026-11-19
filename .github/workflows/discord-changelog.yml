@@ -1,0 +1,26 @@
+# Neue Release veröffentlicht → Änderungen automatisch in den Discord-Kanal #changelog posten.
+# Benötigt das Secret DISCORD_CHANGELOG_WEBHOOK und die Variable DISCORD_UPDATES_ROLE (Rolle „Updates“).
+name: Changelog in Discord posten
+on:
+  release:
+    types: [published]
+jobs:
+  discord:
+    if: ${{ !github.event.release.prerelease }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node .github/scripts/discord-changelog.js
+        env:
+          WEBHOOK: ${{ secrets.DISCORD_CHANGELOG_WEBHOOK }}
+          ROLE: ${{ vars.DISCORD_UPDATES_ROLE }}
+          NAME: ZTX Clips
+          EMOJI: "🎬"
+          COLOR: "15277667"
+          LINK: https://discord.com/channels/1355586399906173060/1569824328738939001
+          TAG: ${{ github.event.release.tag_name }}
+          URL: ${{ github.event.release.html_url }}
+          BODY: ${{ github.event.release.body }}
